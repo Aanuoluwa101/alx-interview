@@ -10,7 +10,7 @@ def canUnlockAll(boxes):
     all_keys = [0]
     
     while all_keys:
-        current_box = queue.pop(0)
+        current_box = all_keys.pop(0)
         box_keys = boxes[current_box]
         
         for key in box_keys:
