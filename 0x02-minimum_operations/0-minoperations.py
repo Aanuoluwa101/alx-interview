@@ -8,7 +8,7 @@
 def minOperations(n):
     """calculates the fewest number of operations
        needed to result in exactly n H characters in the file"""
-    if n < 2:
+    if type(n) != int or n < 2:
         return 0
 
     divisor = 2
@@ -17,7 +17,7 @@ def minOperations(n):
 
     while temp_n > 1:
         while temp_n % divisor == 0:
-            temp_n/=divisor
+            temp_n//=divisor
             factors.append(divisor)
         divisor+=1
 
@@ -25,4 +25,3 @@ def minOperations(n):
     if highest_prime_factor == n:
         return highest_prime_factor
     return highest_prime_factor + 1 + ((n // highest_prime_factor) - 1)
-
