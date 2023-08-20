@@ -34,7 +34,7 @@ def log_parser():
                 count += 1
     except KeyboardInterrupt as e:
         print_dict(dc)
-        raise(e)
+        raise e
 
 
 log_parser()
