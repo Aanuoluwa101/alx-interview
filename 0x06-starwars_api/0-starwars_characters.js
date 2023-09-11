@@ -1,32 +1,33 @@
 #!/usr/bin/node
+/**
+ * 0x0F. Star Wars API
+ */
+const process = require("process");
+const request = require("request");
 
-const request = require('request');
-
-const movieId = process.argv[2];
-const movieEndpoint = 'https://swapi-api.alx-tools.com/api/films/' + movieId;
-
-function sendRequest (characterList, index) {
-  if (characterList.length === index) {
-    return;
-  }
-
-  request(characterList[index], (error, response, body) => {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log(JSON.parse(body).name);
-      sendRequest(characterList, index + 1);
-    }
-  });
+if (process.argv.length !== 3) {
+    process.exit(0);
 }
 
-request(movieEndpoint, (error, response, body) => {
-  if (error) {
-    console.log(error);
-  } else {
-    const characterList = JSON.parse(body).characters;
+function requestCharacter(url) {
+    return new Promise((resolve, reject) => {
+        request(url, (error, response, body) => {
+            error ? reject(error.message) : resolve(JSON.parse(body));
+        });
+    });
+}
 
-    sendRequest(characterList, 0);
-  }
-});
+function requestApi() {
+    const url = `https://swapi-api.hbtn.io/api/films/${process.argv[2]}`;
+    request(url, async (error, response, body) => {
+        error && new Error(error.message);
+        const { characters } = JSON.parse(body);
+        for (const index in characters) {
+            await requestCharacter(characters[index])
+                .then((res) => console.log(res.name))
+                .catch((err) => console.log(err.message));
+        }
+    });
+}
 
+requestApi();
