@@ -1,33 +1,28 @@
 #!/usr/bin/node
-/**
- * 0x0F. Star Wars API
- */
-const process = require("process");
-const request = require("request");
+const request = require('request');
+const URL = 'https://swapi-api.hbtn.io/api';
 
-if (process.argv.length !== 3) {
-    process.exit(0);
+if (process.argv.length > 2) {
+	request(`${URL}/films/${process.argv[2]}/`, (err, _, body) => {
+		if (err) {
+			console.log(err);
+		}
+
+		const charactersURL = JSON.parse(body).characters;
+		const charactersName = charactersURL.map(
+			url => new Promise((resolve, reject) => {
+				request(url, (promiseErr, __, charactersReqBody) => {
+					if (promiseErr) {
+						reject(promiseErr);
+					}
+
+					resolve(JSON.parse(charactersReqBody).name);
+				});
+			}));
+
+		Promise.all(charactersName)
+			.then(names => console.log(names.join('\n')))
+			.catch(allErr => console.log(allErr));
+	});
 }
 
-function requestCharacter(url) {
-    return new Promise((resolve, reject) => {
-        request(url, (error, response, body) => {
-            error ? reject(error.message) : resolve(JSON.parse(body));
-        });
-    });
-}
-
-function requestApi() {
-    const url = `https://swapi-api.hbtn.io/api/films/${process.argv[2]}`;
-    request(url, async (error, response, body) => {
-        error && new Error(error.message);
-        const { characters } = JSON.parse(body);
-        for (const index in characters) {
-            await requestCharacter(characters[index])
-                .then((res) => console.log(res.name))
-                .catch((err) => console.log(err.message));
-        }
-    });
-}
-
-requestApi();
